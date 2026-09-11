@@ -1,0 +1,18 @@
+{
+  "version": "v1.0.0",
+  "title": "飞牛相册 v1.0.0",
+  "page_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.0",
+  "notes": "飞牛相册 TV 端首发版本：NAS 登录、相册浏览、大图查看、幻灯片播放、视频播放、搜索与文件夹浏览。",
+  "assets": [
+    {
+      "name": "feiniu-album-tv-v1.0.0-release.apk",
+      "download_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/download/v1.0.0/feiniu-album-tv-v1.0.0-release.apk",
+      "size": 21098975
+    },
+    {
+      "name": "feiniu-album-tv-v1.0.0-debug.apk",
+      "download_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/download/v1.0.0/feiniu-album-tv-v1.0.0-debug.apk",
+      "size": 27847874
+    }
+  ]
+}
