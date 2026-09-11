@@ -39,6 +39,7 @@ import com.fnphoto.tv.login.LoginDeviceIdentity;
 import com.fnphoto.tv.login.LoginCodeClient;
 import com.fnphoto.tv.login.LoginCodeParser;
 import com.fnphoto.tv.login.LoginQrPayload;
+import com.fnphoto.tv.login.PairingHttpServer;
 import com.fnphoto.tv.login.QrCodeRenderer;
 import com.fnphoto.tv.login.SavedServerHistory;
 import com.fnphoto.tv.settings.UserProfileStore;
@@ -91,6 +92,15 @@ public class LoginActivity extends FragmentActivity {
     private Button btnCancelManual;
     private Button btnCloseDisclaimer;
 
+    // 手机扫码登录（浏览器通道）
+    private View panelPairing;
+    private Button btnPairingLogin;
+    private Button btnPairingClose;
+    private ImageView imgPairingQr;
+    private TextView tvPairingCode;
+    private TextView tvPairingStatus;
+    private PairingHttpServer pairingServer;
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final LoginCodeClient loginCodeClient = new LoginCodeClient();
     private final List<LanServerDiscovery.ServerCandidate> servers = new ArrayList<>();
@@ -122,6 +132,7 @@ public class LoginActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        stopPairingServer();
         super.onDestroy();
     }
 
@@ -174,6 +185,12 @@ public class LoginActivity extends FragmentActivity {
         btnManualConnect = findViewById(R.id.btn_manual_connect);
         btnCancelManual = findViewById(R.id.btn_cancel_manual);
         btnCloseDisclaimer = findViewById(R.id.btn_close_disclaimer);
+        panelPairing = findViewById(R.id.panel_pairing);
+        btnPairingLogin = findViewById(R.id.btn_pairing_login);
+        btnPairingClose = findViewById(R.id.btn_pairing_close);
+        imgPairingQr = findViewById(R.id.img_pairing_qr);
+        tvPairingCode = findViewById(R.id.tv_pairing_code);
+        tvPairingStatus = findViewById(R.id.tv_pairing_status);
     }
 
     private void bindActions() {
@@ -184,6 +201,8 @@ public class LoginActivity extends FragmentActivity {
         tabAccountLogin.setOnClickListener(v -> showAccountTab());
         btnLogin.setOnClickListener(v -> performAccountLogin());
         btnCloseDisclaimer.setOnClickListener(v -> hideDisclaimerDialog());
+        btnPairingLogin.setOnClickListener(v -> openPairingPanel());
+        btnPairingClose.setOnClickListener(v -> closePairingPanel());
         tvDisclaimerAgreement.setText(buildDisclaimerAgreementText());
         tvDisclaimerAgreement.setMovementMethod(LinkMovementMethod.getInstance());
         tvDisclaimerAgreement.setHighlightColor(0x00000000);
@@ -565,6 +584,93 @@ public class LoginActivity extends FragmentActivity {
         editUser.requestFocus();
     }
 
+    // ===================== 手机扫码登录（浏览器通道） =====================
+
+    private void openPairingPanel() {
+        if (pairingServer == null) {
+            pairingServer = new PairingHttpServer();
+            pairingServer.setCredentialListener(this::applyPhoneCredentials);
+        }
+        if (!pairingServer.start()) {
+            Toast.makeText(this, "无法启动配对服务，请检查网络连接", Toast.LENGTH_LONG).show();
+            return;
+        }
+        String qrUrl = pairingServer.getQrUrl();
+        if (qrUrl == null) {
+            Toast.makeText(this, "未找到局域网 IP，请确认电视已连接 Wi-Fi/有线网络", Toast.LENGTH_LONG).show();
+            return;
+        }
+        new Thread(() -> {
+            try {
+                Bitmap qr = QrCodeRenderer.render(qrUrl, dp(280));
+                runOnUiThread(() -> {
+                    imgPairingQr.setImageBitmap(qr);
+                    tvPairingCode.setText("配对码：" + pairingServer.getPairingCode()
+                            + "\n地址：" + qrUrl);
+                    tvPairingStatus.setText("等待手机提交…");
+                    pairingServer.setResult(PairingHttpServer.Result.WAITING, "等待手机提交…");
+                    panelPairing.setVisibility(View.VISIBLE);
+                    panelPairing.bringToFront();
+                    btnPairingClose.requestFocus();
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this,
+                        "生成二维码失败: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }, "fnphoto-pairing-qr").start();
+    }
+
+    private void closePairingPanel() {
+        panelPairing.setVisibility(View.GONE);
+        stopPairingServer();
+    }
+
+    private void stopPairingServer() {
+        if (pairingServer != null) {
+            pairingServer.stop();
+        }
+    }
+
+    private void reportPairing(PairingHttpServer.Result result, String message) {
+        boolean panelVisible = panelPairing != null
+                && panelPairing.getVisibility() == View.VISIBLE;
+        if (pairingServer != null && panelVisible) {
+            pairingServer.setResult(result, message);
+        }
+        if (tvPairingStatus != null && panelVisible) {
+            tvPairingStatus.setText(message);
+        }
+    }
+
+    /** 手机端提交的凭证到达后，自动填表并走 WebSocket 登录。 */
+    private void applyPhoneCredentials(String nasInput, String user, String pass) {
+        String baseUrl = LanServerDiscovery.normalizeServerInput(nasInput);
+        if (baseUrl.isEmpty()) {
+            reportPairing(PairingHttpServer.Result.FAILED, "NAS 地址无效");
+            return;
+        }
+        // 免责声明：手机扫码登录默认视为已同意
+        cbDisclaimerAgree.setChecked(true);
+        getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit().putBoolean("disclaimer_agreed", true).apply();
+
+        // 填入表单，便于失败后用户用遥控器继续操作
+        editUrl.setText(nasInput);
+        editUser.setText(user);
+        editPass.setText(pass);
+
+        LanServerDiscovery.ServerCandidate server = new LanServerDiscovery.ServerCandidate(
+                "手机扫码", baseUrl, hostLabel(baseUrl), portOf(baseUrl), false);
+        addServer(server);
+        persistSavedServer(baseUrl);
+        selectedServer = server;
+        clearTwoFactorChallenge();
+        stopQrPolling();
+        reportPairing(PairingHttpServer.Result.RECEIVED, "已收到凭证，正在登录…");
+        setAccountLoginInProgress(true);
+        doWebSocketLogin(baseUrl, user, pass);
+    }
+
     private void startQrPolling(String code) {
         stopQrPolling();
         if (selectedServer == null || code == null || code.isEmpty()) return;
@@ -682,6 +788,7 @@ public class LoginActivity extends FragmentActivity {
             public void onSuccess(JSONObject response) {
                 runOnUiThread(() -> {
                     setAccountLoginInProgress(false);
+                    reportPairing(PairingHttpServer.Result.SUCCESS, "登录成功");
                     saveAccountSession(httpUrl, user, pass, response);
                 });
             }
@@ -690,6 +797,7 @@ public class LoginActivity extends FragmentActivity {
             public void onTwoFactorRequired(FnWebSocketClient.TwoFactorChallenge challenge) {
                 runOnUiThread(() -> {
                     setAccountLoginInProgress(false);
+                    reportPairing(PairingHttpServer.Result.RECEIVED, "需要二次验证，请在电视上输入验证码");
                     if (!challenge.canVerifyWithTotp()) {
                         clearTwoFactorChallenge();
                         Toast.makeText(LoginActivity.this,
@@ -708,6 +816,7 @@ public class LoginActivity extends FragmentActivity {
             public void onError(String msg) {
                 runOnUiThread(() -> {
                     setAccountLoginInProgress(false);
+                    reportPairing(PairingHttpServer.Result.FAILED, "登录失败: " + msg);
                     Toast.makeText(LoginActivity.this, "登录失败: " + msg, Toast.LENGTH_LONG).show();
                 });
             }
