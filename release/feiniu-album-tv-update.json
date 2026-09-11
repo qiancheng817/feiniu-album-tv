@@ -1,13 +1,13 @@
 {
-  "version": "v1.0.4",
-  "title": "飞牛相册 v1.0.4",
-  "page_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.4",
-  "notes": "1. 应用图标改为白底（之前透明背景在部分 launcher 上会显示为黑色，与彩色花瓣对比突兀）；2. 局域网发现功能大幅强化——支持 5666/8000/5000/80 多端口扫描，并通过 /v/api/v1/sys/config 指纹验证剔除路由器、摄像头等其他 HTTP 服务导致的误报；3. 应用内检查更新功能完善（设置 → 软件更新行）。",
+  "version": "v1.0.5",
+  "title": "飞牛相册 v1.0.5",
+  "page_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.5",
+  "notes": "修复登录页「手机扫码登录」按钮在 TV 安全区底部被裁切、显示不全的问题：通过弹性 spacer 把按钮锚定在屏幕底部 56dp 处，并压缩顶部品牌区与标题字号，确保 1080p / 4K 各种 TV 屏上都能完整显示。",
   "assets": [
     {
-      "name": "feiniu-album-tv-v1.0.4-release.apk",
-      "download_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/download/v1.0.4/feiniu-album-tv-v1.0.4-release.apk",
-      "size": 14309447
+      "name": "feiniu-album-tv-v1.0.5-release.apk",
+      "download_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/download/v1.0.5/feiniu-album-tv-v1.0.5-release.apk",
+      "size": 14309469
     }
   ]
 }
