@@ -26,7 +26,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,9 +45,7 @@ import com.fnphoto.tv.settings.UserProfileStore;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 public class LoginActivity extends FragmentActivity {
@@ -60,7 +57,6 @@ public class LoginActivity extends FragmentActivity {
     private View panelServerSelect;
     private View panelConnecting;
     private View panelLogin;
-    private LinearLayout serverList;
     private View manualAddPanel;
     private EditText editUrl;
     private EditText editUser;
@@ -69,9 +65,7 @@ public class LoginActivity extends FragmentActivity {
     private CheckBox cbRemember;
     private CheckBox cbTrustDevice;
     private CheckBox cbDisclaimerAgree;
-    private ProgressBar progressBar;
     private ProgressBar progressQr;
-    private TextView tvStatus;
     private TextView tvQrStatus;
     private TextView tvConnectServerName;
     private TextView tvConnectServerHost;
@@ -92,9 +86,12 @@ public class LoginActivity extends FragmentActivity {
     private Button btnCancelManual;
     private Button btnCloseDisclaimer;
 
+    // 登录首页双卡片（左：添加服务器 / 右：手机扫码登录）
+    private View cardAddServer;
+    private View cardPairingLogin;
+
     // 手机扫码登录（浏览器通道）
     private View panelPairing;
-    private Button btnPairingLogin;
     private Button btnPairingClose;
     private ImageView imgPairingQr;
     private TextView tvPairingCode;
@@ -103,9 +100,7 @@ public class LoginActivity extends FragmentActivity {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final LoginCodeClient loginCodeClient = new LoginCodeClient();
-    private final List<LanServerDiscovery.ServerCandidate> servers = new ArrayList<>();
     private final Set<String> knownServerUrls = new LinkedHashSet<>();
-    private int pendingDiscoveryTasks = 0;
     private LanServerDiscovery.ServerCandidate selectedServer;
     private FnWebSocketClient wsClient;
     private Runnable qrPollRunnable;
@@ -145,16 +140,13 @@ public class LoginActivity extends FragmentActivity {
         bindViews();
         bindActions();
         loadSavedInputs();
-        renderServerCards();
-        startSavedServerDiscovery();
-        startLanDiscovery();
+        cardAddServer.requestFocus();
     }
 
     private void bindViews() {
         panelServerSelect = findViewById(R.id.panel_server_select);
         panelConnecting = findViewById(R.id.panel_connecting);
         panelLogin = findViewById(R.id.panel_login);
-        serverList = findViewById(R.id.server_list);
         manualAddPanel = findViewById(R.id.manual_add_panel);
         editUrl = findViewById(R.id.edit_nas_url);
         editUser = findViewById(R.id.edit_username);
@@ -163,9 +155,7 @@ public class LoginActivity extends FragmentActivity {
         cbRemember = findViewById(R.id.cb_remember);
         cbTrustDevice = findViewById(R.id.cb_trust_device);
         cbDisclaimerAgree = findViewById(R.id.cb_disclaimer_agree);
-        progressBar = findViewById(R.id.progress_bar);
         progressQr = findViewById(R.id.progress_qr);
-        tvStatus = findViewById(R.id.tv_status);
         tvQrStatus = findViewById(R.id.tv_qr_status);
         tvConnectServerName = findViewById(R.id.tv_connect_server_name);
         tvConnectServerHost = findViewById(R.id.tv_connect_server_host);
@@ -186,11 +176,12 @@ public class LoginActivity extends FragmentActivity {
         btnCancelManual = findViewById(R.id.btn_cancel_manual);
         btnCloseDisclaimer = findViewById(R.id.btn_close_disclaimer);
         panelPairing = findViewById(R.id.panel_pairing);
-        btnPairingLogin = findViewById(R.id.btn_pairing_login);
         btnPairingClose = findViewById(R.id.btn_pairing_close);
         imgPairingQr = findViewById(R.id.img_pairing_qr);
         tvPairingCode = findViewById(R.id.tv_pairing_code);
         tvPairingStatus = findViewById(R.id.tv_pairing_status);
+        cardAddServer = findViewById(R.id.card_add_server);
+        cardPairingLogin = findViewById(R.id.card_pairing_login);
     }
 
     private void bindActions() {
@@ -201,7 +192,8 @@ public class LoginActivity extends FragmentActivity {
         tabAccountLogin.setOnClickListener(v -> showAccountTab());
         btnLogin.setOnClickListener(v -> performAccountLogin());
         btnCloseDisclaimer.setOnClickListener(v -> hideDisclaimerDialog());
-        btnPairingLogin.setOnClickListener(v -> openPairingPanel());
+        cardAddServer.setOnClickListener(v -> showManualAddPanel());
+        cardPairingLogin.setOnClickListener(v -> openPairingPanel());
         btnPairingClose.setOnClickListener(v -> closePairingPanel());
         tvDisclaimerAgreement.setText(buildDisclaimerAgreementText());
         tvDisclaimerAgreement.setMovementMethod(LinkMovementMethod.getInstance());
@@ -287,161 +279,6 @@ public class LoginActivity extends FragmentActivity {
         cbDisclaimerAgree.setChecked(prefs.getBoolean("disclaimer_agreed", false));
     }
 
-    private void startSavedServerDiscovery() {
-        SharedPreferences prefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        Set<String> seededUrls = new LinkedHashSet<>();
-        String lastConnected = firstNonBlank(prefs.getString("nas_url", ""), prefs.getString("saved_url", ""));
-        if (!lastConnected.isEmpty()) {
-            seededUrls.add(LanServerDiscovery.normalizeServerInput(lastConnected));
-        }
-        for (String savedUrl : SavedServerHistory.decode(prefs.getString(SavedServerHistory.PREF_KEY, ""))) {
-            String baseUrl = LanServerDiscovery.normalizeServerInput(savedUrl);
-            if (!baseUrl.isEmpty()) {
-                seededUrls.add(baseUrl);
-            }
-        }
-        if (seededUrls.isEmpty()) {
-            return;
-        }
-
-        beginDiscoveryTask();
-        LanServerDiscovery.discoverSavedAsync(new ArrayList<>(seededUrls), found -> runOnUiThread(() -> {
-            for (LanServerDiscovery.ServerCandidate candidate : found) {
-                addServer(candidate);
-            }
-            finishDiscoveryTask();
-        }));
-    }
-
-    private void startLanDiscovery() {
-        beginDiscoveryTask();
-        LanServerDiscovery.discoverAsync(found -> runOnUiThread(() -> {
-            for (LanServerDiscovery.ServerCandidate candidate : found) {
-                addServer(candidate);
-            }
-            finishDiscoveryTask();
-        }));
-    }
-
-    private void beginDiscoveryTask() {
-        pendingDiscoveryTasks++;
-        progressBar.setVisibility(View.VISIBLE);
-        tvStatus.setText("正在搜索局域网内的飞牛服务器");
-    }
-
-    private void finishDiscoveryTask() {
-        pendingDiscoveryTasks = Math.max(0, pendingDiscoveryTasks - 1);
-        renderServerCards();
-        if (pendingDiscoveryTasks > 0) {
-            return;
-        }
-        progressBar.setVisibility(View.GONE);
-        tvStatus.setText(servers.isEmpty()
-                ? "没有自动发现服务器，可以手动添加地址"
-                : "选择一个服务器继续");
-    }
-
-    private void renderServerCards() {
-        serverList.removeAllViews();
-        serverList.addView(createAddServerCard());
-        for (LanServerDiscovery.ServerCandidate server : servers) {
-            serverList.addView(createServerCard(server));
-        }
-        if (serverList.getChildCount() > 0 && manualAddPanel.getVisibility() != View.VISIBLE) {
-            handler.postDelayed(() -> serverList.getChildAt(0).requestFocus(), 150);
-        }
-    }
-
-    private View createAddServerCard() {
-        LinearLayout card = baseServerCard();
-        card.setOnClickListener(v -> {
-            if (manualAddPanel.getVisibility() == View.VISIBLE) {
-                hideManualAddPanel();
-            } else {
-                showManualAddPanel();
-            }
-        });
-
-        TextView plus = new TextView(this);
-        plus.setText("+");
-        plus.setTextColor(0xFFE8ECF4);
-        plus.setTextSize(46);
-        plus.setGravity(Gravity.CENTER);
-        plus.setBackgroundResource(R.drawable.bg_login_card_soft);
-        LinearLayout.LayoutParams plusParams = new LinearLayout.LayoutParams(dp(86), dp(86));
-        card.addView(plus, plusParams);
-
-        TextView title = cardTitle("添加服务器");
-        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        titleParams.topMargin = dp(26);
-        card.addView(title, titleParams);
-        return card;
-    }
-
-    private View createServerCard(LanServerDiscovery.ServerCandidate server) {
-        LinearLayout card = baseServerCard();
-        card.setOnClickListener(v -> connectServer(server));
-
-        TextView icon = new TextView(this);
-        icon.setText("NAS");
-        icon.setGravity(Gravity.CENTER);
-        icon.setTextColor(0xFFDDE8FF);
-        icon.setTextSize(22);
-        icon.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        icon.setBackgroundResource(R.drawable.bg_login_card_soft);
-        card.addView(icon, new LinearLayout.LayoutParams(dp(104), dp(72)));
-
-        TextView title = cardTitle(server.name);
-        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        titleParams.topMargin = dp(24);
-        card.addView(title, titleParams);
-
-        TextView subtitle = new TextView(this);
-        subtitle.setText(server.host + ":" + server.port);
-        subtitle.setTextColor(0xFFB6BEC9);
-        subtitle.setTextSize(17);
-        subtitle.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        subtitleParams.topMargin = dp(6);
-        card.addView(subtitle, subtitleParams);
-        return card;
-    }
-
-    private LinearLayout baseServerCard() {
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setGravity(Gravity.CENTER);
-        card.setFocusable(true);
-        card.setClickable(true);
-        card.setBackgroundResource(R.drawable.bg_login_card);
-        card.setPadding(dp(18), dp(18), dp(18), dp(18));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(220), dp(220));
-        params.setMarginEnd(dp(28));
-        card.setLayoutParams(params);
-        return card;
-    }
-
-    private TextView cardTitle(String text) {
-        TextView title = new TextView(this);
-        title.setText(text);
-        title.setTextColor(0xFFFFFFFF);
-        title.setTextSize(20);
-        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        title.setGravity(Gravity.CENTER);
-        title.setSingleLine(false);
-        title.setMaxLines(2);
-        return title;
-    }
-
     private void connectManualServer() {
         String baseUrl = LanServerDiscovery.normalizeServerInput(editUrl.getText().toString());
         if (baseUrl.isEmpty()) {
@@ -464,9 +301,7 @@ public class LoginActivity extends FragmentActivity {
 
     private void hideManualAddPanel() {
         manualAddPanel.setVisibility(View.GONE);
-        if (serverList.getChildCount() > 0) {
-            serverList.getChildAt(0).requestFocus();
-        }
+        cardAddServer.requestFocus();
     }
 
     private void connectServer(LanServerDiscovery.ServerCandidate server) {
@@ -558,9 +393,7 @@ public class LoginActivity extends FragmentActivity {
         manualAddPanel.setVisibility(View.GONE);
         imgQrCode.setImageDrawable(null);
         progressQr.setVisibility(View.VISIBLE);
-        if (serverList.getChildCount() > 0) {
-            serverList.getChildAt(Math.min(1, serverList.getChildCount() - 1)).requestFocus();
-        }
+        cardAddServer.requestFocus();
     }
 
     private void showQrTab() {
@@ -941,9 +774,7 @@ public class LoginActivity extends FragmentActivity {
 
     private void addServer(LanServerDiscovery.ServerCandidate server) {
         if (server == null || server.baseUrl == null || server.baseUrl.isEmpty()) return;
-        if (knownServerUrls.add(server.baseUrl)) {
-            servers.add(server);
-        }
+        knownServerUrls.add(server.baseUrl);
     }
 
     private void persistSavedServer(String baseUrl) {

@@ -1,13 +1,13 @@
 {
-  "version": "v1.0.5",
-  "title": "飞牛相册 v1.0.5",
-  "page_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.5",
-  "notes": "修复登录页「手机扫码登录」按钮在 TV 安全区底部被裁切、显示不全的问题：通过弹性 spacer 把按钮锚定在屏幕底部 56dp 处，并压缩顶部品牌区与标题字号，确保 1080p / 4K 各种 TV 屏上都能完整显示。",
+  "version": "v1.0.6",
+  "title": "飞牛相册 v1.0.6",
+  "page_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.6",
+  "notes": "登录页布局重构：去掉自动扫描的历史服务器列表，改为左右两卡片布局——左侧「添加服务器」手动填地址，右侧「手机扫码登录」直接扫码；页面整体居中，不再靠上。",
   "assets": [
     {
-      "name": "feiniu-album-tv-v1.0.5-release.apk",
-      "download_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/download/v1.0.5/feiniu-album-tv-v1.0.5-release.apk",
-      "size": 14309469
+      "name": "feiniu-album-tv-v1.0.6-release.apk",
+      "download_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/download/v1.0.6/feiniu-album-tv-v1.0.6-release.apk",
+      "size": 14308910
     }
   ]
 }
