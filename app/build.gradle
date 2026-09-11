@@ -37,7 +37,10 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.fnphoto.tv"
+        // 包名必须是唯一的：上游影格相册用的是 com.fnphoto.tv，
+        // 若与它同名，在同一台设备上会因「同名包 + 不同签名」被拒绝安装（提示「应用未安装」）。
+        // 故改为独立包名，可与影格相册并存。namespace 保持 com.fnphoto.tv 不变，代码无需改动。
+        applicationId "com.feiniu.tv"
         minSdk 23
         targetSdk 36
         versionCode = (project.findProperty("fnVersionCode") ?: "1").toString().toInteger()

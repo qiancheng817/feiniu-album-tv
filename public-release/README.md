@@ -25,16 +25,16 @@
 
 <!-- release-links:start -->
 - 产品介绍页：[https://qiancheng817.github.io/feiniu-album-tv/](https://qiancheng817.github.io/feiniu-album-tv/)
-- 下载页面：[https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.1](https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.1)
+- 下载页面：[https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.2](https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.2)
 <!-- release-links:end -->
 
 APK 发布包放在 `release/` 目录中。下载后可通过 U 盘、ADB 或电视自带的安装器安装。
 
-- `feiniu-album-tv-v1.0.1-compat-release.apk`：**推荐**。兼容加固版，native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性，适配安卓 8.x 电视固件。
-- `feiniu-album-tv-v1.0.0-release.apk`：v1.0.0 正式签名版。
-- `feiniu-album-tv-v1.0.0-debug.apk`：v1.0.0 调试版，便于排查问题。
+- `feiniu-album-tv-v1.0.2-release.apk`：**推荐**。独立包名 `com.feiniu.tv`，可与影格相册并存安装；native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性。
+- `feiniu-album-tv-v1.0.0-release.apk`：v1.0.0 正式签名版（旧包名，已废弃）。
+- `feiniu-album-tv-v1.0.0-debug.apk`：v1.0.0 调试版（旧包名，已废弃），便于排查问题。
 
-若电视提示「应用未安装」：先在 设置 → 应用管理 卸载旧版本，再改用 v1.0.1 兼容加固版，并尽量用 U 盘拷贝安装而非浏览器下载。
+若电视提示「应用未安装」：请改用 v1.0.2 或更新版本。v1.0.1 及更早版本使用了与影格相册相同的包名 `com.fnphoto.tv`，在已安装影格相册的设备上会因签名不同被拒绝安装；v1.0.2 起改用独立包名，无需卸载任何一方。另建议尽量用 U 盘拷贝安装而非浏览器下载。
 
 安装前请确认：
 
