@@ -66,6 +66,16 @@ android {
         buildConfig true
     }
 
+    // 兼容旧版 / 国产电视固件：
+    // 新版 AGP 默认 extractNativeLibs=false（.so 不压缩、直接 mmap），
+    // 部分 Android 8.x 电视 ROM 的安装器/校验链路不支持，会以「应用未安装」失败。
+    // 这里改为安装时解压 native 库的经典打包方式，最大化安装兼容性。
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     signingConfigs {
         release {
             if (releaseSigningReady) {

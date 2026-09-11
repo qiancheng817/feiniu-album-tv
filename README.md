@@ -39,16 +39,23 @@
 - 下载页面：[Releases](https://github.com/qiancheng817/feiniu-album-tv/releases)
 <!-- release-links:end -->
 
-本仓库的 `releases/` 目录中也直接存放了安装包：
+本仓库的 `release/` 目录中也直接存放了安装包：
 
-- `feiniu-album-tv-v1.0.0-release.apk`：正式签名版（20.1 MB），推荐安装。
-- `feiniu-album-tv-v1.0.0-debug.apk`：调试版（26.5 MB），便于排查问题。
+- `feiniu-album-tv-v1.0.1-compat-release.apk`：**推荐**。兼容加固版（13.7 MB），native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性，适配安卓 8.x 电视固件。
+- `feiniu-album-tv-v1.0.0-release.apk`：v1.0.0 正式签名版（20.1 MB）。
+- `feiniu-album-tv-v1.0.0-debug.apk`：v1.0.0 调试版（26.5 MB），便于排查问题。
 
 下载 APK 后，可通过 U 盘、ADB 或电视自带的安装器进行安装。
 
+若电视提示「应用未安装」，优先尝试：
+
+1. 先在 设置 → 应用管理 中卸载已存在的旧版本（不同签名的同名应用必须先卸载）。
+2. 改用上面的 `v1.0.1` 兼容加固版。
+3. 用 U 盘拷贝安装，而非在电视浏览器内下载，避免下载被截断。
+
 安装前请确认：
 
-- APK 来源为你信任的发布页面。
+- APK 来源为你信任的发布页面，并与发布页给出的 SHA-256 一致。
 - 电视已允许安装来自外部来源的应用。
 - NAS 中的重要数据已经做好备份。
 - 公网、端口转发、反向代理、内网穿透或 FN Connect 等远程访问方式已经完成安全评估。

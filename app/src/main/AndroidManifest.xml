@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     
+    <!-- 同时声明 LEANBACK_LAUNCHER 与普通 LAUNCHER，故此处不强制要求电视特性，
+         以兼容非 Google 认证的安卓电视/电视盒子固件（部分国产 ROM 会据此做兼容性拦截）。 -->
     <uses-feature
         android:name="android.software.leanback"
-        android:required="true" />
+        android:required="false"
+        tools:replace="android:required" />
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
