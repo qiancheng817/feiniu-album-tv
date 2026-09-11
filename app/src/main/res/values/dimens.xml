@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tv_rail_width_collapsed">164dp</dimen>
+    <dimen name="tv_rail_width_expanded">232dp</dimen>
+    <dimen name="tv_rail_padding_horizontal">14dp</dimen>
+    <dimen name="tv_content_padding_start">0dp</dimen>
+    <dimen name="tv_content_padding_top">0dp</dimen>
+    <dimen name="tv_home_content_top">116dp</dimen>
+    <dimen name="tv_card_width">352dp</dimen>
+    <dimen name="tv_card_height">208dp</dimen>
+    <dimen name="tv_date_card_width">316dp</dimen>
+    <dimen name="tv_date_card_height">214dp</dimen>
+    <dimen name="tv_person_card_size">252dp</dimen>
+    <dimen name="tv_card_corner">8dp</dimen>
+    <dimen name="tv_focus_ring">5dp</dimen>
+    <dimen name="tv_nav_item_height">60dp</dimen>
+    <dimen name="tv_nav_item_radius">8dp</dimen>
+    <dimen name="tv_overlay_radius">8dp</dimen>
+    <dimen name="tv_text_title">30sp</dimen>
+    <dimen name="tv_text_row_header">24sp</dimen>
+    <dimen name="tv_text_card_title">14sp</dimen>
+    <dimen name="tv_text_card_meta">12sp</dimen>
+    <dimen name="tv_text_nav">18sp</dimen>
+    <dimen name="tv_search_panel_width">980dp</dimen>
+</resources>

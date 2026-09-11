@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TvText" />
+
+    <style name="TvText.Display">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textColor">@color/album_paper</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TvText.Body">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/album_paper</item>
+    </style>
+
+    <style name="TvText.Utility">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/silver_gelatin</item>
+    </style>
+</resources>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_shell"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_app">
+
+    <ImageView
+        android:id="@+id/hero_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.42"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/hero_scrim" />
+
+    <FrameLayout
+        android:id="@+id/main_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingLeft="@dimen/tv_content_padding_start"
+        android:paddingTop="@dimen/tv_content_padding_top" />
+
+    <LinearLayout
+        android:id="@+id/hero_caption"
+        android:layout_width="720dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="428dp"
+        android:layout_marginTop="64dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/hero_title"
+            style="@style/TvText.Display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/hero_subtitle"
+            style="@style/TvText.Utility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_panel"
+        android:layout_width="@dimen/tv_rail_width_collapsed"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_nav_panel"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/tv_rail_padding_horizontal"
+        android:paddingTop="28dp"
+        android:paddingRight="@dimen/tv_rail_padding_horizontal"
+        android:paddingBottom="28dp">
+
+        <TextView
+            android:id="@+id/tv_app_title"
+            style="@style/TvText.Display"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:text="FN"
+            android:textSize="28sp" />
+
+        <androidx.leanback.widget.VerticalGridView
+            android:id="@+id/menu_grid"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:overScrollMode="never" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/loading_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#8F10100E"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/tv_loading_text"
+            style="@style/TvText.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="正在加载..."
+            android:textSize="18sp" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="projection_black">#10100E</color>
+    <color name="contact_sheet">#1B1A16</color>
+    <color name="contact_sheet_raised">#24231F</color>
+    <color name="album_paper">#EDE5D2</color>
+    <color name="silver_gelatin">#8A8276</color>
+    <color name="focus_mint">#6ECFC1</color>
+    <color name="focus_glow">#B86ECFC1</color>
+    <color name="date_amber">#D7B56D</color>
+    <color name="negative_coral">#E06C5C</color>
+    <color name="hero_scrim">#9810100E</color>
+    <color name="cinema_scrim">#C810100E</color>
+    <color name="nav_glass">#C9141411</color>
+    <color name="nav_glass_focus">#E51B2925</color>
+    <color name="panel_scrim">#E51B1A16</color>
+    <color name="transparent">#00000000</color>
+</resources>

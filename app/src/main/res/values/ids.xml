@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="media_item_id" type="id"/>
+    <item name="media_item_type" type="id"/>
+    <item name="detail_loading_panel" type="id"/>
+    <item name="card_image" type="id"/>
+    <item name="card_gradient" type="id"/>
+    <item name="card_title" type="id"/>
+    <item name="card_meta" type="id"/>
+    <item name="card_badge" type="id"/>
+    <item name="compose_image_url" type="id"/>
+</resources>

@@ -1,0 +1,126 @@
+import java.util.Properties
+
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+
+def ignoredSigningProperties = new Properties()
+def ignoredSigningPropertiesFile = rootProject.file('private/signing/release-signing.properties')
+if (ignoredSigningPropertiesFile.exists()) {
+    ignoredSigningPropertiesFile.withInputStream { ignoredSigningProperties.load(it) }
+}
+
+def releaseStoreFile = localProperties.getProperty('fnphoto.release.storeFile')
+        ?: ignoredSigningProperties.getProperty('fnphoto.release.storeFile')
+        ?: System.getenv('FNPHOTO_RELEASE_STORE_FILE')
+def releaseStorePassword = localProperties.getProperty('fnphoto.release.storePassword')
+        ?: ignoredSigningProperties.getProperty('fnphoto.release.storePassword')
+        ?: System.getenv('FNPHOTO_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = localProperties.getProperty('fnphoto.release.keyAlias')
+        ?: ignoredSigningProperties.getProperty('fnphoto.release.keyAlias')
+        ?: System.getenv('FNPHOTO_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = localProperties.getProperty('fnphoto.release.keyPassword')
+        ?: ignoredSigningProperties.getProperty('fnphoto.release.keyPassword')
+        ?: System.getenv('FNPHOTO_RELEASE_KEY_PASSWORD')
+def releaseSigningReady = releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
+def fnUpdateRepo = (project.findProperty("fnUpdateRepo") ?: "qiancheng817/feiniu-album-tv").toString()
+def fnUpdateManifestName = (project.findProperty("fnUpdateManifestName") ?: "feiniu-album-tv-update.json").toString()
+def fnUpdateManifestUrl = "https://github.com/${fnUpdateRepo}/releases/latest/download/${fnUpdateManifestName}"
+
+android {
+    namespace 'com.fnphoto.tv'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.fnphoto.tv"
+        minSdk 23
+        targetSdk 36
+        versionCode = (project.findProperty("fnVersionCode") ?: "1").toString().toInteger()
+        versionName = (project.findProperty("fnVersionName") ?: "1.0").toString()
+        buildConfigField "String", "FN_UPDATE_REPO", "\"${fnUpdateRepo}\""
+        buildConfigField "String", "FN_UPDATE_MANIFEST_URL", "\"${fnUpdateManifestUrl}\""
+        
+        // API 21+ 支持原生 multidex，保留开关以兼容当前依赖规模
+        multiDexEnabled true
+
+        def fnAbi = project.findProperty("fnAbi")
+        if (fnAbi != null && fnAbi.toString().trim()) {
+            ndk {
+                abiFilters(*(fnAbi.toString().split(',').collect { it.trim() } as String[]))
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        compose true
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            if (releaseSigningReady) {
+                storeFile rootProject.file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (releaseSigningReady) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation platform('androidx.compose:compose-bom:2026.06.00')
+    implementation 'androidx.activity:activity-compose:1.13.0'
+    implementation 'androidx.compose.foundation:foundation'
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.tv:tv-material:1.1.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0'
+
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+    implementation 'androidx.leanback:leanback:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
+
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+
+    implementation 'org.conscrypt:conscrypt-android:2.5.2'
+    implementation 'com.google.zxing:core:3.5.3'
+
+    // Test dependencies
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testImplementation 'org.json:json:20230227'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
+
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+}

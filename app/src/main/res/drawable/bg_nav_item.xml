@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/tv_nav_item_radius" />
+            <solid android:color="@color/nav_glass_focus" />
+            <stroke
+                android:width="3dp"
+                android:color="@color/focus_mint" />
+        </shape>
+    </item>
+    <item android:state_selected="true">
+        <shape>
+            <corners android:radius="@dimen/tv_nav_item_radius" />
+            <solid android:color="#386ECFC1" />
+            <stroke
+                android:width="2dp"
+                android:color="#806ECFC1" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/tv_nav_item_radius" />
+            <solid android:color="@color/transparent" />
+        </shape>
+    </item>
+</selector>

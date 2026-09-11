@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_text"
+    style="@style/TvText.Utility"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/tv_nav_item_height"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/bg_nav_item"
+    android:ellipsize="end"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
+    android:maxLines="1"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:textColor="@color/album_paper"
+    android:textSize="@dimen/tv_text_nav" />
