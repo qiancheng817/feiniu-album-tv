@@ -25,12 +25,12 @@
 
 <!-- release-links:start -->
 - 产品介绍页：[https://qiancheng817.github.io/feiniu-album-tv/](https://qiancheng817.github.io/feiniu-album-tv/)
-- 下载页面：[https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.3](https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.3)
+- 下载页面：[https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.4](https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.4)
 <!-- release-links:end -->
 
 APK 发布包放在 `release/` 目录中。下载后可通过 U 盘、ADB 或电视自带的安装器安装。
 
-- `feiniu-album-tv-v1.0.3-release.apk`：**推荐**。独立包名 `com.feiniu.tv`，可与影格相册并存安装；native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性。
+- `feiniu-album-tv-v1.0.4-release.apk`：**推荐**。独立包名 `com.feiniu.tv`，可与影格相册并存安装；native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性。
 - `feiniu-album-tv-v1.0.0-release.apk`：v1.0.0 正式签名版（旧包名，已废弃）。
 - `feiniu-album-tv-v1.0.0-debug.apk`：v1.0.0 调试版（旧包名，已废弃），便于排查问题。
 

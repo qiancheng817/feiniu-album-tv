@@ -41,7 +41,7 @@
 
 本仓库的 `release/` 目录中也直接存放了安装包：
 
-- `feiniu-album-tv-v1.0.3-release.apk`：**推荐**。v1.0.3（13.7 MB），独立包名 `com.feiniu.tv`，可与影格相册并存安装；native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性。
+- `feiniu-album-tv-v1.0.4-release.apk`：**推荐**。v1.0.4（13.7 MB），独立包名 `com.feiniu.tv`，可与影格相册并存安装；native 库安装时解压、仅含 `armeabi-v7a` / `arm64-v8a`、不强制要求 leanback 特性。
 - `feiniu-album-tv-v1.0.0-release.apk`：v1.0.0 正式签名版（20.1 MB，旧包名 `com.fnphoto.tv`，已废弃）。
 - `feiniu-album-tv-v1.0.0-debug.apk`：v1.0.0 调试版（26.5 MB，旧包名，已废弃），便于排查问题。
 
