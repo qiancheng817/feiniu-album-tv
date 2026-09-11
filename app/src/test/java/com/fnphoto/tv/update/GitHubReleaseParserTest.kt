@@ -71,6 +71,36 @@ class GitHubReleaseParserTest {
     }
 
     @Test
+    fun parseLatestRelease_prefersReleaseApkOverDebugApk() {
+        val release = GitHubReleaseParser.parseLatestRelease(
+            """
+            {
+              "tag_name": "v1.0.0",
+              "name": "飞牛相册 v1.0.0",
+              "html_url": "https://github.com/qiancheng817/feiniu-album-tv/releases/tag/v1.0.0",
+              "body": "Release notes",
+              "assets": [
+                {
+                  "name": "feiniu-album-tv-v1.0.0-debug.apk",
+                  "browser_download_url": "https://example.test/debug.apk",
+                  "size": 27765935
+                },
+                {
+                  "name": "feiniu-album-tv-v1.0.0-release.apk",
+                  "browser_download_url": "https://example.test/release.apk",
+                  "size": 21098978
+                }
+              ]
+            }
+            """.trimIndent(),
+        )
+
+        assertEquals("feiniu-album-tv-v1.0.0-release.apk", release.apkAsset?.name)
+        assertEquals("https://example.test/release.apk", release.apkAsset?.downloadUrl)
+        assertEquals(21098978L, release.apkAsset?.sizeBytes)
+    }
+
+    @Test
     fun parseLatestRelease_returnsFirstApkWhenUniversalIsMissing() {
         val release = GitHubReleaseParser.parseLatestRelease(
             """

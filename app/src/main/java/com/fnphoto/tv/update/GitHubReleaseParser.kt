@@ -17,6 +17,8 @@ object GitHubReleaseParser {
             .orEmpty()
         val apkAssets = assets.filter { it.name.endsWith(".apk", ignoreCase = true) }
         val preferredAsset = apkAssets.firstOrNull { it.name.contains("universal", ignoreCase = true) }
+            ?: apkAssets.firstOrNull { it.name.contains("release", ignoreCase = true) }
+            ?: apkAssets.firstOrNull { !it.name.contains("debug", ignoreCase = true) }
             ?: apkAssets.firstOrNull()
         val version = root.stringOrBlank("version").ifBlank { root.stringOrBlank("tag_name") }
 

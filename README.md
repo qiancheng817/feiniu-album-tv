@@ -41,7 +41,8 @@
 
 本仓库的 `releases/` 目录中也直接存放了安装包：
 
-- `feiniu-album-tv-v1.0.0-universal.apk`：通用包，适合不确定设备 ABI 或希望兼容更多电视盒子的用户。
+- `feiniu-album-tv-v1.0.0-release.apk`：正式签名版（20.1 MB），推荐安装。
+- `feiniu-album-tv-v1.0.0-debug.apk`：调试版（26.5 MB），便于排查问题。
 
 下载 APK 后，可通过 U 盘、ADB 或电视自带的安装器进行安装。
 

@@ -30,8 +30,8 @@
 
 APK 发布包放在 `releases/` 目录中。下载后可通过 U 盘、ADB 或电视自带的安装器安装。
 
-- `feiniu-album-tv-v1.0.10-universal.apk`：通用包，适合不确定设备 ABI 或希望兼容更多电视盒子的用户。
-- `feiniu-album-tv-v1.0.10-armeabi-v7a.apk`：32 位 ARM 单 ABI 包，适合 armeabi-v7a 设备，体积更小。
+- `feiniu-album-tv-v1.0.0-release.apk`：正式签名版，推荐安装。
+- `feiniu-album-tv-v1.0.0-debug.apk`：调试版，便于排查问题。
 
 安装前请确认：
 
